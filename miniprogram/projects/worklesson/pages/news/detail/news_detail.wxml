@@ -1,0 +1,95 @@
+<view wx:if="{{isLoad===null}}" class="margin-top load notexist text-l load-project"></view>
+<view wx:if="{{isLoad===false}}" class="margin-top load loading text-l load-project"></view>
+
+<block wx:if="{{isLoad}}">
+	<view class="main padding-project">
+		<view class="article-box margin-top-xs">
+			<!-- article content begin -->
+			<view class="article card-project shadow-project">
+				<view class="title"><text user-select="true">{{news.NEWS_TITLE}}</text></view>
+				<view class="meta-info">
+					<text class="time">{{news.NEWS_ADD_TIME}}</text>
+					<text class="category">{{news.NEWS_CATE_NAME}}</text>
+					<text class="view-count">阅读 {{news.NEWS_VIEW_CNT || 0}}</text>
+				</view>
+
+				<!-- 封面图片展示 -->
+				<view wx:if="{{news.NEWS_PIC && news.NEWS_PIC.length > 0}}" class="cover-gallery margin-top">
+					<view class="gallery-title text-bold margin-bottom-sm">图片展示</view>
+					<view class="cover-images">
+						<block wx:for="{{news.NEWS_PIC}}" wx:key="index">
+							<image 
+								bindtap="url" 
+								data-type='img' 
+								data-url="{{item}}" 
+								show-menu-by-longpress="{{true}}" 
+								class="cover-image loading shadow-light" 
+								mode='aspectFill' 
+								lazy-load="true" 
+								src="{{item}}">
+							</image>
+						</block>
+					</view>
+				</view>
+
+				<!-- 详细内容展示 -->
+				<view wx:if="{{news.NEWS_CONTENT && news.NEWS_CONTENT.length > 0}}" class="detail-content margin-top">
+					<view class="content-title text-bold margin-bottom-sm">详细内容</view>
+					<block wx:for="{{news.NEWS_CONTENT}}" wx:key="index">
+						<view class="content-item" wx:if="{{item.type=='text'}}">
+							<text user-select="{{true}}" class="content-text">{{item.val}}</text>
+						</view>
+
+						<view class="content-item" wx:if="{{item.type=='img'}}">
+							<image 
+								bindtap="url" 
+								data-type='img' 
+								data-url="{{item.val}}" 
+								show-menu-by-longpress="{{true}}" 
+								class="content-image loading shadow-light" 
+								mode='widthFix' 
+								lazy-load="true" 
+								src="{{item.val}}">
+							</image>
+						</view>
+					</block>
+				</view>
+
+				<!-- 当没有详细内容时的提示 -->
+				<view wx:elif="{{(!news.NEWS_CONTENT || news.NEWS_CONTENT.length === 0) && news.NEWS_DESC}}" class="simple-content margin-top">
+					<view class="content-title text-bold margin-bottom-sm">内容摘要</view>
+					<view class="desc-content">
+						<text user-select="{{true}}" class="content-text">{{news.NEWS_DESC}}</text>
+					</view>
+				</view>
+
+				<!-- 完全没有内容时的提示 -->
+				<view wx:elif="{{(!news.NEWS_CONTENT || news.NEWS_CONTENT.length === 0) && !news.NEWS_DESC}}" class="no-content margin-top">
+					<view class="no-content-tip text-gray text-center">
+						<text class="icon-info text-xxl">📄</text>
+						<text class="tip-text">暂无详细内容</text>
+					</view>
+				</view>
+
+				<!-- 统计信息 -->
+				<view class="content-stats margin-top">
+					<view class="stats-item">
+						<text class="stats-label">内容段落:</text>
+						<text class="stats-value">{{news.NEWS_CONTENT ? news.NEWS_CONTENT.length : 0}}</text>
+					</view>
+					<view class="stats-item">
+						<text class="stats-label">图片数量:</text>
+						<text class="stats-value">{{news.NEWS_PIC ? news.NEWS_PIC.length : 0}}</text>
+					</view>
+				</view>
+				<!-- article content end -->
+
+			</view>
+			<!-- article content end -->
+
+		</view>
+
+	</view> 
+
+	<cmpt-detail mode="mode1" topBtnShow="{{topBtnShow}}" oid="{{news._id}}" cate="{{news.NEWS_CATE_NAME}}" title="{{news.NEWS_TITLE}}" cover="{{news.NEWS_PIC[0]}}" qr="{{news.NEWS_QR}}" desc="查看详情"  bg="{{skin.PROJECT_COLOR}}" color="red"></cmpt-detail>
+</block>
