@@ -46,9 +46,9 @@
     "swc": false,
     "disableSWC": true
   },
-  "appid": "wxb82487b5f379d971",
+  "appid": "wx4e634238563d76d6",
   "projectname": "Multi多功能平台",
-  "libVersion": "2.30.2",
+  "libVersion": "3.8.11",
   "simulatorType": "wechat",
   "simulatorPluginLibVersion": {},
   "cloudfunctionTemplateRoot": "cloudfunctionTemplate/",

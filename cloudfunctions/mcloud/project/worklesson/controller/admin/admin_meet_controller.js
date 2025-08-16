@@ -384,14 +384,18 @@ class AdminMeetController extends BaseProjectAdminController {
 	async updateMeetForms() {
 		await this.isAdmin();
 
+		console.log('updateMeetForms: 收到请求参数', this._request);
+		
 		// 数据校验
 		let rules = {
-			id: 'must|id',
+			id: 'id', // 移除must约束，允许id为空，但在service中处理
 			hasImageForms: 'array'
 		};
 
 		// 取得数据
 		let input = this.validateData(rules);
+		
+		console.log('updateMeetForms: 校验后的输入参数', input);
 
 		// 内容审核
 		await contentCheck.checkTextMultiAdmin(input);

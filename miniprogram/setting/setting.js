@@ -1,9 +1,9 @@
 ﻿module.exports = {
 	//### 环境相关 
-	CLOUD_ID: 'cloud1-8g3z9rpqad168726', //云服务id ,本地测试环境 
+	CLOUD_ID: 'cloud1-5gg2jpoq921c2623', //云服务id ,本地测试环境 
 
 	// #### 版本信息 
-	VER: 'build 2025.07.11',
+	VER: 'build 2025.08.10',
 	COMPANY: 'Super Singer',
 
 	// #### 系统参数 

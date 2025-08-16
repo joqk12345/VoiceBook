@@ -105,10 +105,35 @@ Page({
 		try {
 			// 先创建，再上传 
 			let result = await cloudHelper.callCloudSumbit('admin/meet_insert', data);
-			let meetId = result.data.id;
+			console.log('添加预约返回结果:', result);
+			
+			// 检查返回结果
+			if (!result) {
+				pageHelper.showModal('添加预约失败: 返回结果为空');
+				return;
+			}
+			
+			if (result.code != 200) {
+				pageHelper.showModal('添加预约失败: ' + (result.msg || '未知错误'));
+				return;
+			}
+			
+			let meetId = result.data;
+			console.log('预约ID:', meetId, '类型:', typeof meetId);
+			
+			// 检查meetId是否为空
+			if (!meetId) {
+				pageHelper.showModal('添加预约失败: 返回的预约ID为空');
+				return;
+			}
 
 			// 图片
-			await cloudHelper.transFormsTempPics(forms, 'meet/', meetId, 'admin/meet_update_forms');
+			console.log('准备上传图片，meetId=', meetId, 'forms=', forms);
+			if (meetId) {
+				await cloudHelper.transFormsTempPics(forms, 'meet/', meetId, 'admin/meet_update_forms');
+			} else {
+				console.error('meetId为空，跳过图片上传');
+			}
 
 
 			let callback = async function () {
@@ -117,10 +142,11 @@ Page({
 				wx.navigateBack();
 
 			}
-			pageHelper.showSuccToast('添加成功', 2000, callback);
+			pageHelper.showSuccToast('添加预约成功', 2000, callback);
 
 		} catch (err) {
-			console.log(err);
+			console.error('添加预约异常:', err);
+			pageHelper.showModal('添加预约失败: ' + (err ? err.msg : '网络异常'));
 		}
 
 	},
