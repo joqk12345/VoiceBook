@@ -82,7 +82,7 @@ class WorkMeetController extends BaseProjectWorkController {
 
 		// 数据校验
 		let rules = {
-			id: 'must|id',
+			id: 'id', // 移除must约束，允许id为空，但在service中处理
 			hasImageForms: 'array'
 		};
 

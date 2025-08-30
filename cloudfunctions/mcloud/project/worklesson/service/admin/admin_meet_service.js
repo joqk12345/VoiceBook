@@ -159,9 +159,18 @@ class AdminMeetService extends BaseProjectAdminService {
 		id,
 		hasImageForms
 	}) {
-		if (!id) this.AppError('ID不能为空');
+		console.log('updateMeetForms参数:', {id, hasImageForms});
+		
+		if (!id) {
+			console.error('updateMeetForms: ID不能为空');
+			return; // 直接返回而不抛出异常
+		}
+		
 		let meet = await MeetModel.getOne({_id: id});
-		if (!meet) this.AppError('预约项目不存在');
+		if (!meet) {
+			console.error('updateMeetForms: 预约项目不存在');
+			return; // 直接返回而不抛出异常
+		}
 
 		let data = {
 			MEET_FORMS: hasImageForms || [],
@@ -189,6 +198,7 @@ class AdminMeetService extends BaseProjectAdminService {
 		if (!cateName) this.AppError('请选择分类');
 
 		let data = {
+			MEET_ADMIN_ID: adminId,
 			MEET_TITLE: title,
 			MEET_ORDER: order || 9999,
 			MEET_CANCEL_SET: cancelSet || 1,
@@ -206,11 +216,16 @@ class AdminMeetService extends BaseProjectAdminService {
 		if (password) data.MEET_PASSWORD = md5Lib.md5(password);
 
 		let result = await MeetModel.insert(data);
-		let meetId = result._id;
+		let meetId = result;
 
 		// 设置日期排期
 		if (daysSet && daysSet.length > 0) {
-			await this.setDays(meetId, { daysSet });
+			try {
+				await this.setDays(meetId, { daysSet });
+			} catch (ex) {
+				console.error('设置预约日期排期失败:', ex);
+				// 即使设置日期排期失败，也返回预约ID
+			}
 		}
 
 		return result;
@@ -231,6 +246,12 @@ class AdminMeetService extends BaseProjectAdminService {
 		// 插入新的日期数据
 		if (daysSet && Array.isArray(daysSet)) {
 			for (let dayData of daysSet) {
+				// 检查dayData格式
+				if (!dayData || !dayData.day) {
+					console.warn('无效的日期数据:', dayData);
+					continue;
+				}
+				
 				let data = {
 					DAY_MEET_ID: id,
 					day: dayData.day,

@@ -390,25 +390,68 @@ async function transFormsTempPics(forms, dir, id, route) {
 		mask: true
 	});
 
+	// 检查id是否为空
+	if (!id) {
+		console.error('transFormsTempPics: id不能为空，跳过图片上传');
+		wx.hideLoading();
+		return;
+	}
+
+	// 检查forms是否为空
+	if (!forms || !Array.isArray(forms) || forms.length === 0) {
+		console.warn('transFormsTempPics: forms为空，跳过图片上传');
+		wx.hideLoading();
+		return;
+	}
+
 	let hasImageForms = [];
 	for (let k = 0; k < forms.length; k++) {
 		if (forms[k].type == 'image') {
+			// 检查图片值是否为空
+			if (!forms[k].val || (Array.isArray(forms[k].val) && forms[k].val.length === 0)) {
+				console.warn('transFormsTempPics: 图片字段为空，跳过', forms[k]);
+				continue;
+			}
 			forms[k].val = await transTempPics(forms[k].val, dir, id, 'image');
 			hasImageForms.push(forms[k]);
 		}
 		else if (forms[k].type == 'content') {
+			// 检查内容值是否为空
+			if (!forms[k].val) {
+				console.warn('transFormsTempPics: 内容字段为空，跳过', forms[k]);
+				continue;
+			}
+			
 			let contentVal = forms[k].val;
+			let hasImageInContent = false;
+			
 			for (let j in contentVal) {
 				if (contentVal[j].type == 'img') {
+					// 检查图片值是否为空
+					if (!contentVal[j].val) {
+						console.warn('transFormsTempPics: 内容中的图片为空，跳过', contentVal[j]);
+						continue;
+					}
+					
 					let ret = await transTempPics([contentVal[j].val], dir, id, 'content');
 					contentVal[j].val = ret[0];
+					hasImageInContent = true;
 				}
 			}
-			hasImageForms.push(forms[k]);
+			
+			// 只有当内容中有图片时才添加到hasImageForms
+			if (hasImageInContent) {
+				hasImageForms.push(forms[k]);
+			}
 		}
 	}
 
-	if (hasImageForms.length == 0) return;
+	// 如果没有需要处理的图片，则直接返回
+	if (hasImageForms.length == 0) {
+		console.log('transFormsTempPics: 没有需要上传的图片，跳过更新');
+		wx.hideLoading();
+		return;
+	}
 
 	let params = {
 		id,
@@ -416,10 +459,15 @@ async function transFormsTempPics(forms, dir, id, route) {
 	}
 
 	try {
+		console.log('transFormsTempPics: 调用更新接口', route, params);
 		await callCloudSumbit(route, params);
 	} catch (err) {
-		console.error(err);
+		console.error('transFormsTempPics: 更新接口调用失败', err);
+		wx.hideLoading();
+		throw err;
 	}
+	
+	wx.hideLoading();
 }
 
 async function transTempPicOne(img, dir, id, isCheck = true) {
